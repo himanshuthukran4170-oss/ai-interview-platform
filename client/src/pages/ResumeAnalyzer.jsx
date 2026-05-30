@@ -29,7 +29,7 @@ function Home() {
       setLoading(true);
 
       const response = await axios.post(
-        "http://localhost:5000/api/resume/analyze",
+        `${import.meta.env.VITE_API_URL}/api/resume/analyze`,
         formData
       );
 

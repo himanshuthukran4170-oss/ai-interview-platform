@@ -23,7 +23,7 @@ function Profile() {
     try {
 
       const response = await axios.get(
-        `http://localhost:5000/api/interview/stats/${user?.id}`
+        `${import.meta.env.VITE_API_URL}/api/interview/stats/${user?.id}`
       );
 
       setStats(response.data.stats);

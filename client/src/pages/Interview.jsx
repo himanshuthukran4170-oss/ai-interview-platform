@@ -29,7 +29,7 @@ function Interview() {
       setLoading(true);
 
       const response = await axios.post(
-        "http://localhost:5000/api/interview/generate",
+        `${import.meta.env.VITE_API_URL}/api/interview/generate`,
         {
           role,
         }
@@ -58,7 +58,7 @@ function Interview() {
       setLoading(true);
 
       const response = await axios.post(
-        "http://localhost:5000/api/interview/evaluate",
+        `${import.meta.env.VITE_API_URL}/api/interview/evaluate`,
         {
           role,
           questions,
