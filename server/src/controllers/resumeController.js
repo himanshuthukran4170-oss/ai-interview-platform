@@ -5,7 +5,7 @@ const groq = require("../config/groq");
 
 exports.analyzeResume = async (req, res) => {
   try {
-    console.log("Request received");
+    console.log("========== RESUME ANALYSIS START ==========");
 
     if (!req.file) {
       console.log("No file uploaded");
@@ -17,7 +17,20 @@ exports.analyzeResume = async (req, res) => {
     }
 
     console.log("File path:", req.file.path);
-    console.log("File exists:", fs.existsSync(req.file.path));
+    console.log("Full file object:", req.file);
+
+    const fileExists = fs.existsSync(req.file.path);
+
+    console.log("File exists:", fileExists);
+
+    if (!fileExists) {
+      return res.status(500).json({
+        success: false,
+        message: "Uploaded file not found",
+        path: req.file.path,
+      });
+    }
+
     const pdfBuffer = fs.readFileSync(req.file.path);
 
     console.log("PDF read successful");
@@ -27,6 +40,8 @@ exports.analyzeResume = async (req, res) => {
     console.log("PDF parsed successful");
 
     fs.unlinkSync(req.file.path);
+
+    console.log("Uploaded file deleted");
 
     const resumeText = pdfData.text;
 
@@ -66,7 +81,8 @@ Required JSON format:
     const aiResponse =
       completion.choices[0]?.message?.content || "";
 
-    console.log("Raw AI Response:", aiResponse);
+    console.log("Raw AI Response:");
+    console.log(aiResponse);
 
     const cleanedResponse = aiResponse
       .replace(/```json/g, "")
@@ -91,6 +107,8 @@ Required JSON format:
       });
     }
 
+    console.log("========== RESUME ANALYSIS SUCCESS ==========");
+
     return res.status(200).json({
       success: true,
       analysis: parsedResponse,
@@ -98,11 +116,13 @@ Required JSON format:
 
   } catch (error) {
 
-    console.log("Resume Error:", error);
+    console.log("========== RESUME ANALYSIS ERROR ==========");
+    console.log(error);
 
     return res.status(500).json({
       success: false,
       message: "Server Error",
+      error: error.message,
     });
 
   }
