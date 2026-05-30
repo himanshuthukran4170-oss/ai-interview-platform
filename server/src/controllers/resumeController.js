@@ -17,7 +17,7 @@ exports.analyzeResume = async (req, res) => {
     }
 
     console.log("File path:", req.file.path);
-
+    console.log("File exists:", fs.existsSync(req.file.path));
     const pdfBuffer = fs.readFileSync(req.file.path);
 
     console.log("PDF read successful");
