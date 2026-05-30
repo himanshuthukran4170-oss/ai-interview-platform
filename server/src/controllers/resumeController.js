@@ -5,18 +5,27 @@ const groq = require("../config/groq");
 
 exports.analyzeResume = async (req, res) => {
   try {
+    console.log("Request received");
+
     if (!req.file) {
+      console.log("No file uploaded");
+
       return res.status(400).json({
         success: false,
         message: "No PDF uploaded",
       });
     }
 
+    console.log("File path:", req.file.path);
+
     const pdfBuffer = fs.readFileSync(req.file.path);
+
+    console.log("PDF read successful");
 
     const pdfData = await pdfParse(pdfBuffer);
 
-    // Delete uploaded file after parsing
+    console.log("PDF parsed successful");
+
     fs.unlinkSync(req.file.path);
 
     const resumeText = pdfData.text;
@@ -39,6 +48,8 @@ Required JSON format:
 }
 `;
 
+    console.log("Calling Groq API...");
+
     const completion = await groq.chat.completions.create({
       messages: [
         {
@@ -50,10 +61,13 @@ Required JSON format:
       temperature: 0.3,
     });
 
+    console.log("Groq response received");
+
     const aiResponse =
       completion.choices[0]?.message?.content || "";
 
-    // Clean markdown if AI returns ```json
+    console.log("Raw AI Response:", aiResponse);
+
     const cleanedResponse = aiResponse
       .replace(/```json/g, "")
       .replace(/```/g, "")
@@ -63,7 +77,13 @@ Required JSON format:
 
     try {
       parsedResponse = JSON.parse(cleanedResponse);
+
+      console.log("JSON parsed successfully");
+
     } catch (error) {
+
+      console.log("JSON Parse Error:", error);
+
       return res.status(500).json({
         success: false,
         message: "Invalid AI JSON response",
@@ -75,12 +95,15 @@ Required JSON format:
       success: true,
       analysis: parsedResponse,
     });
+
   } catch (error) {
-    console.log(error);
+
+    console.log("Resume Error:", error);
 
     return res.status(500).json({
       success: false,
       message: "Server Error",
     });
+
   }
 };
