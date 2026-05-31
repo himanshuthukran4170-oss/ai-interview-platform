@@ -4,4 +4,5 @@ dist
 client/node_modules
 server/node_modules
 client/dist
-uploads/
+server/uploads/*
+!server/uploads/.gitkeep
