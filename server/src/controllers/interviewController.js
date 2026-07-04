@@ -6,14 +6,8 @@ exports.generateQuestions = async (req, res) => {
 
     const { role } = req.body;
     const {questionCount}=req.body;
-    if (!questionCount || questionCount < 1 || questionCount > 20) {
-      return res.status(400).json({
-        success: false,
-        message: "questionCount must be between 1 and 20",
-      });
-    }
     const prompt = `
-Generate 1 interview questions for a ${role} role.
+Generate ${questionCount} interview questions for a ${role} role.
 
 Return ONLY valid JSON array.
 
@@ -62,22 +56,19 @@ Example:
 
 };
 exports.evaluateAnswers = async (req, res) => {
-
+  
   try {
+    console.log("Request Body:", req.body);
 
     const {
       role,
       questions,
       answers,
       name,
-      userId
     } = req.body;
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        message: "You must be logged in to submit answers. Please log in again.",
-      });
-    }
+
+    const userId = req.user.id;
+
     const prompt = `
 You are an expert technical interviewer.
 
@@ -124,7 +115,6 @@ Format:
     
     const parsedResponse =
       JSON.parse(cleanedResponse);
-      console.log("userId:", userId);
     await Interview.create({
       user:userId,
       role,
@@ -155,7 +145,7 @@ Format:
 
 exports.getInterviewHistory=async(req,res)=>{
   try {
-    const {userId}=req.params;
+    const userId=req.user.id;
     const interviews=await Interview.find({
       user:userId,
     }).sort({
@@ -179,7 +169,7 @@ exports.getInterviewStats = async (req, res) => {
 
   try {
 
-    const { userId } = req.params;
+    const userId = req.user.id;
 
     const interviews = await Interview.find({
       user: userId,

@@ -1,13 +1,13 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { useContext } from "react";
 import {AuthContext} from "../context/AuthContext";
 function Interview() {
 
   const [role, setRole] = useState("");
-
-  const [questions, setQuestions] = useState([]);
   const [questionCount,setQuestionCount]=useState(5);
+  const [questions, setQuestions] = useState([]);
+
   const [answers, setAnswers] = useState({});
 
   const [result, setResult] = useState(null);
@@ -23,17 +23,13 @@ function Interview() {
       return;
 
     }
-    if (!questionCount || questionCount < 1 || questionCount > 20) {
-      alert("Please enter a number of questions between 1 and 20");
-      return;
-    }
 
     try {
 
       setLoading(true);
 
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/interview/generate`,
+      const response = await api.post(
+        "/api/interview/generate",
         {
           role,
           questionCount
@@ -57,22 +53,26 @@ function Interview() {
   };
 
   const evaluateInterview = async () => {
-    if(!user?.id){
-      alert("your session has expired. please login again");
+
+    if (!user?.id) {
+
+      alert("Your session has expired. Please log in again.");
+
       return;
+
     }
+
     try {
 
       setLoading(true);
 
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/interview/evaluate`,
+      const response = await api.post(
+        "/api/interview/evaluate",
         {
           role,
           questions,
           answers,
           name:user?.name,
-          userId:user?.id,
         }
       );
 
@@ -81,6 +81,11 @@ function Interview() {
     } catch (error) {
 
       console.log(error);
+
+      alert(
+        error.response?.data?.message ||
+          "Something went wrong while evaluating your answers. Please try again."
+      );
 
     } finally {
 
@@ -107,15 +112,17 @@ function Interview() {
           value={role}
           onChange={(e) => setRole(e.target.value)}
         />
-        <input
-          type="number"
-          min={1}
-          max={20}
+        <select 
           value={questionCount}
           onChange={(e)=>setQuestionCount(Number(e.target.value))}
-          placeholder="Number of question(1-20)"
-          className="w-full border rounded-lg p-2 mt-3"
-        />
+          className="w-full border rounded-lg p-2"
+        >
+          <option value={1}>1 question</option>
+          <option value={5}>5 question</option>
+          <option value={10}>10 question</option>
+          <option value={15}>15 question</option>
+          <option value={20}>20 question</option>
+        </select>
         <button
           onClick={generateInterviewQuestions}
           disabled={loading}

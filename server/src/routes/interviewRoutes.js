@@ -1,6 +1,8 @@
 const express=require("express");
 const router =express.Router();
 
+const protect = require("../middleware/authMiddleware");
+
 const {
     generateQuestions,
     evaluateAnswers,
@@ -9,18 +11,22 @@ const {
   } = require("../controllers/interviewController");
 router.post(
     "/generate",
+    protect,
     generateQuestions
 );
 router.post(
     "/evaluate",
+    protect,
     evaluateAnswers
 );
 router.get(
-    "/history/:userId",
+    "/history",
+    protect,
     getInterviewHistory
 );
 router.get(
-    "/stats/:userId",
+    "/stats",
+    protect,
     getInterviewStats
 );
 module.exports=router;

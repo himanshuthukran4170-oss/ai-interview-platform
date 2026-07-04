@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
 
 function Profile() {
@@ -22,9 +22,7 @@ function Profile() {
 
     try {
 
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/interview/stats/${user?.id}`
-      );
+      const response = await api.get("/api/interview/stats");
 
       setStats(response.data.stats);
 
