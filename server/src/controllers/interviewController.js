@@ -5,6 +5,13 @@ exports.generateQuestions = async (req, res) => {
   try {
 
     const { role } = req.body;
+    const {questionCount}=req.body;
+    if (!questionCount || questionCount < 1 || questionCount > 20) {
+      return res.status(400).json({
+        success: false,
+        message: "questionCount must be between 1 and 20",
+      });
+    }
     const prompt = `
 Generate 1 interview questions for a ${role} role.
 
@@ -65,6 +72,12 @@ exports.evaluateAnswers = async (req, res) => {
       name,
       userId
     } = req.body;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "You must be logged in to submit answers. Please log in again.",
+      });
+    }
     const prompt = `
 You are an expert technical interviewer.
 

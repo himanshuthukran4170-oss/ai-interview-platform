@@ -7,7 +7,7 @@ function Interview() {
   const [role, setRole] = useState("");
 
   const [questions, setQuestions] = useState([]);
-
+  const [questionCount,setQuestionCount]=useState(5);
   const [answers, setAnswers] = useState({});
 
   const [result, setResult] = useState(null);
@@ -23,6 +23,10 @@ function Interview() {
       return;
 
     }
+    if (!questionCount || questionCount < 1 || questionCount > 20) {
+      alert("Please enter a number of questions between 1 and 20");
+      return;
+    }
 
     try {
 
@@ -32,6 +36,7 @@ function Interview() {
         `${import.meta.env.VITE_API_URL}/api/interview/generate`,
         {
           role,
+          questionCount
         }
       );
 
@@ -52,7 +57,10 @@ function Interview() {
   };
 
   const evaluateInterview = async () => {
-
+    if(!user?.id){
+      alert("your session has expired. please login again");
+      return;
+    }
     try {
 
       setLoading(true);
@@ -99,7 +107,15 @@ function Interview() {
           value={role}
           onChange={(e) => setRole(e.target.value)}
         />
-
+        <input
+          type="number"
+          min={1}
+          max={20}
+          value={questionCount}
+          onChange={(e)=>setQuestionCount(Number(e.target.value))}
+          placeholder="Number of question(1-20)"
+          className="w-full border rounded-lg p-2 mt-3"
+        />
         <button
           onClick={generateInterviewQuestions}
           disabled={loading}
