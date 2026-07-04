@@ -14,7 +14,7 @@ function Dashboard() {
       <div>
 
         <h1 className="text-4xl font-bold">
-          AI Interview Preparation Platform
+          PrepWise AI
         </h1>
 
         <p className="text-gray-600 mt-2">
