@@ -43,7 +43,10 @@ function Interview() {
     } catch (error) {
 
       console.log(error);
-
+      alert(
+        error.response?.data?.message ||
+          "Something went wrong while generating questions. Please try again."
+      );
     } finally {
 
       setLoading(false);

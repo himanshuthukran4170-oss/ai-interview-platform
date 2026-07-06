@@ -2,7 +2,7 @@ const express=require("express");
 const router =express.Router();
 
 const protect = require("../middleware/authMiddleware");
-
+const aiLimiter=require("../middleware/rateLimiter");
 const {
     generateQuestions,
     evaluateAnswers,
@@ -12,11 +12,13 @@ const {
 router.post(
     "/generate",
     protect,
+    aiLimiter,
     generateQuestions
 );
 router.post(
     "/evaluate",
     protect,
+    aiLimiter,
     evaluateAnswers
 );
 router.get(

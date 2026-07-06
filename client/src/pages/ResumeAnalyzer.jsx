@@ -44,6 +44,10 @@ function Home() {
     } catch (error) {
 
       console.log(error);
+      alert(
+        error.response?.data?.message ||
+          "Something went wrong while analyzing your resume."
+      );
 
     } finally {
 

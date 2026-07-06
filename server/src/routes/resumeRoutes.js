@@ -9,6 +9,7 @@ const {
 
 const upload = require("../middleware/uploadMiddleware");
 const protect= require("../middleware/authMiddleware");
+const aiLimiter=require("../middleware/rateLimiter");
 router.post(
   "/analyze",
   protect,
@@ -18,6 +19,7 @@ router.post(
 router.post(
   "/match",
   protect,
+  aiLimiter,
   upload.single("resume"),
   matchResume
 );
