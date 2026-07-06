@@ -6,8 +6,34 @@ exports.generateQuestions = async (req, res) => {
 
     const { role } = req.body;
     const {questionCount}=req.body;
+    const userId=req.user.id;
+    const pastInterviews = await Interview.find({
+      user: userId,
+      role,
+    })
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    const previousQuestions = [
+      ...new Set(
+        pastInterviews.flatMap((interview) => interview.questions)
+      ),
+    ];
+
+    const avoidSection =
+      previousQuestions.length > 0
+        ? `
+Avoid repeating any of these previously asked questions, and avoid close variations of them:
+${JSON.stringify(previousQuestions)}
+`
+        : "";
+
     const prompt = `
 Generate ${questionCount} interview questions for a ${role} role.
+
+${avoidSection}
+
+Cover a varied mix of subtopics and difficulty levels rather than clustering around the same few concepts.
 
 Return ONLY valid JSON array.
 
@@ -198,7 +224,13 @@ exports.getInterviewStats = async (req, res) => {
             )
           )
         : 0;
-
+    const scoreHistory=interviews
+          .sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt))
+          .map((interviews)=>({
+            date:new Date(interviews.createdAt).toLocaleDateString(),
+            score:interviews.score,
+            role:interviews.role,
+          }));
     return res.status(200).json({
       success: true,
       stats: {
@@ -206,6 +238,7 @@ exports.getInterviewStats = async (req, res) => {
         averageScore,
         highestScore,
       },
+      scoreHistory,
     });
 
   } catch (error) {
